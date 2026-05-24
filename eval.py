@@ -85,7 +85,9 @@ def run(cfg: DictConfig):
     policy = cfg.get("policy", "random")
 
     if policy != "random":
-        model = swm.wm.utils.load_pretrained(cfg.policy)
+        cache_dir = os.getenv("STABLEWM_HOME") + f"/{cfg.policy}"
+        print("Loading model from {}".format(cache_dir))
+        model = swm.wm.utils.load_pretrained(name='lewm_object.pt', cache_dir=cache_dir)
         model = model.to("cuda")
         model = model.eval()
         model.requires_grad_(False)
@@ -141,6 +143,7 @@ def run(cfg: DictConfig):
     results_path.mkdir(parents=True, exist_ok=True)
 
     start_time = time.time()
+    print("Running evaluation...")
     metrics = world.evaluate(
         dataset=dataset,
         start_steps=eval_start_idx.tolist(),

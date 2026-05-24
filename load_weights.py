@@ -10,7 +10,7 @@ import argparse
 
 def load_hf_checkpoint(dataset="pusht"):
     src = Path(swm.data.utils.get_cache_dir(), f"hf_{dataset}")
-    out = Path(swm.data.utils.get_cache_dir(), dataset, "lewm_object.ckpt")
+    out = Path(swm.data.utils.get_cache_dir(), dataset + "/checkpoints", "lewm_object.pt")
 
     cfg = json.loads((src / "config.json").read_text())
     encoder = spt.backbone.utils.vit_hf(
@@ -75,10 +75,9 @@ def load_hf_checkpoint(dataset="pusht"):
 
         translated_state_dict[new_key] = tensor
 
-    sd = torch.load(src / "weights.pt", map_location="cpu", weights_only=False)  # noqa: F841
     model.load_state_dict(translated_state_dict, strict=True)
     out.parent.mkdir(parents=True, exist_ok=True)
-    torch.save(model, out)
+    torch.save(model.state_dict(), out)
     print("Successfully saved weights to ", out)
 
 
