@@ -29,6 +29,13 @@ def load_hf_checkpoint(dataset="pusht"):
             norm_fn=torch.nn.BatchNorm1d,
         )
 
+    # Make sure format of config file is correct
+    try:
+        del cfg["predictor"]["_target_"]
+        del cfg["action_encoder"]["_target_"]
+    except KeyError:
+        print("Config file is already in the correct format.")
+
     model = JEPA(
         encoder=encoder,
         predictor=ARPredictor(**cfg["predictor"]),
